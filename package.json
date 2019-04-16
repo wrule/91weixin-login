@@ -7,8 +7,10 @@
   },
   "license": "MIT",
   "dependencies": {
+    "bluebird": "^3.5.4",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.7.0",
-    "koa-router": "^7.4.0"
+    "koa-router": "^7.4.0",
+    "mysql2": "^1.6.5"
   }
 }
