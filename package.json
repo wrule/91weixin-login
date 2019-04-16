@@ -1,0 +1,14 @@
+{
+  "name": "91weixin-login",
+  "version": "1.0.0",
+  "main": "./src/index.js",
+  "scripts": {
+    "dev": "node ./src/index.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "jsonwebtoken": "^8.5.1",
+    "koa": "^2.7.0",
+    "koa-router": "^7.4.0"
+  }
+}
