@@ -1,33 +1,37 @@
 
-const mysql = require("./utils/mysql");
+const mysqlPool = require("./utils/mysqlPool");
 
-mysql.dbInit({
-    host: "www.91weixin.net",
-    user: "gu",
-    password: "gushihao",
-    database: "91weixin",
-});
-
-// const fs = require("fs");
-
-// let users = [];
-
-// function readUsers () {
-//     let jsonStr = fs.readFileSync("./users.json").toString();
-//     let users = JSON.parse(jsonStr);
-//     return users;
-// }
-// function writeUsers (users) {
-//     fs.writeFileSync("./users.json", JSON.stringify(users));
-// }
+const usersDal = require("./dal/users");
+const UUID = require("uuid/v4");
 
 
-// function userLogin (userName, password) {
-    
-// }
+async function main () {
+    await mysqlPool.open();
+    // console.log(UUID());
+    // await usersDal.insertUser({
+    //     id: UUID(),
+    //     password: "gushihao",
+    //     nickname: "鸡毛巾",
+    //     gender: 1,
+    //     email: "gushihao@hotmail.com",
+    //     phone: "13645810952",
+    // });
 
+    let obj = await usersDal.queryUserByPhone("13645810952");
+    console.log(obj);
 
+    // await mysqlPool.tran(async cnt => {
+    //     await cnt.query("insert into users set ?", {
+    //         id: UUID(),
+    //         password: "gushihao",
+    //         nickname: "鸡毛巾",
+    //         gender: 1,
+    //         email: "gushihao@hotmail.com",
+    //         phone: "13645810952",
+    //     });
+    // });
 
-// users = readUsers();
-// users.push({ name: "你好，世界" });
-// writeUsers(users);
+    await mysqlPool.close();
+}
+
+main();
