@@ -19,17 +19,30 @@ module.exports = {
     async close () {
         await pool.end();
     },
-    // 执行SQL语句
-    async exec (sql, params) {
-        connection = await pool.getConnection();
-        let result = await connection.execute(sql, params);
-        connection.release();
+    // 执行查询
+    async query (sql, params) {
+        let result = null;
+        if (connection) {
+            result = await connection.query(sql, params);
+        }
+        else {
+            let curCnt = await pool.getConnection();
+            result = await curCnt.query(sql, params);
+            curCnt.release();
+        }
         return result;
     },
-    async query (sql, params) {
-        connection = await pool.getConnection();
-        let result = await connection.query(sql, params);
-        connection.release();
+    // 执行SQL语句
+    async exec (sql, params) {
+        let result = null;
+        if (connection) {
+            result = await connection.execute(sql, params);
+        }
+        else {
+            let curCnt = await pool.getConnection();
+            result = await curCnt.execute(sql, params);
+            curCnt.release();
+        }
         return result;
     },
     // 执行事务
@@ -39,5 +52,6 @@ module.exports = {
         await func(connection);
         await connection.commit();
         connection.release();
+        connection = null;
     },
 };
