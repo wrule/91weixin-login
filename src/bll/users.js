@@ -1,7 +1,8 @@
 
+const UUID = require("uuid/v4");
 const rtv = require("../utils/rtv");
 const usersDAL = require("../dal/users");
-const UUID = require("uuid/v4");
+const captchaBLL = require("./captcha");
 
 module.exports = {
     // 注册用户
@@ -14,6 +15,17 @@ module.exports = {
         }
         if (user.gender !== 0 && user.gender !== 1) {
             return rtv.error("性别非法");
+        }
+        if (!user.captcha ||
+            !user.captcha.uid ||
+            !user.captcha.code) {
+            return rtv.error("请正确输入验证码");
+        }
+        else {
+            let result = await captchaBLL.CAPTCHAValidation(user.captcha.uid, user.captcha.code);
+            if (!result) {
+                return rtv.error("验证码输入错误");
+            }
         }
         user.nickname = user.nickname.trim();
         user.password = user.password.trim();

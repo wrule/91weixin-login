@@ -6,7 +6,7 @@ const redisClient = require("../utils/redisClient");
 let client = redisClient.create(1);
 
 module.exports = {
-    // 新建图形验证码
+    // 生成图形验证码
     createCAPTCHA () {
         return svgCaptcha.create({
             color: true,
@@ -52,9 +52,21 @@ module.exports = {
     },
     // 验证图形验证码
     async CAPTCHAValidation (uid, code) {
-        let rdsCode = await client.getAsync(uid);
-        if (rdsCode.toLowerCase() == code.toLowerCase()) {
-            return true;
+        let exists = await client.existsAsync(uid);
+        if (exists) {
+            let rdsCode = await client.getAsync(uid);
+            await client.del(uid);
+            if (rdsCode) {
+                if (rdsCode.toLowerCase() == code.toLowerCase()) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                return false;
+            }
         }
         else {
             return false;

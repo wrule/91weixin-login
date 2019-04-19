@@ -2,6 +2,9 @@ const rtv = require("../utils/rtv");
 const usersDAL = require("../dal/users");
 const JWT = require("jsonwebtoken");
 const appConfig = require("../../app.json");
+const redisClient = require("../utils/redisClient");
+
+let client = redisClient.create(0);
 
 module.exports = {
     // 登录验证
@@ -40,6 +43,7 @@ module.exports = {
             role: userResult.role,
         };
         let token = JWT.sign(tokenInfo, appConfig.privateKey);
+        await client.setex(token, 20 * 60, 1);
         return rtv.success({ token: token }, "登录成功");
     }
 };
