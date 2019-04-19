@@ -13,7 +13,7 @@ module.exports = {
         if (!user.password) {
             return rtv.error("密码为空");
         }
-        if (user.gender !== 0 && user.gender !== 1) {
+        if (user.gender !== 1 && user.gender !== 2) {
             return rtv.error("性别非法");
         }
         if (!user.captcha ||
@@ -27,6 +27,7 @@ module.exports = {
                 return rtv.error("验证码输入错误");
             }
         }
+        delete user.captcha;
         user.nickname = user.nickname.trim();
         user.password = user.password.trim();
         let findResult = await usersDAL.queryUserByNickName(user.nickname);
