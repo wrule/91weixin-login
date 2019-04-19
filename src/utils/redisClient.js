@@ -4,10 +4,11 @@ const bluebird = require("bluebird");
 bluebird.promisifyAll(redis);
 const appConfig = require("../../app.json");
 
-let client = redis.createClient(appConfig.redisConnection);
-
 module.exports = {
-    me () {
-        return client;
+    create (dbIndex = 0) {
+        return redis.createClient({
+            ...appConfig.redisConnection,
+            db: dbIndex,
+        });
     },
 };
