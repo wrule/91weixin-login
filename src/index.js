@@ -4,9 +4,9 @@ const Koa = require("koa");
 const KoaRouter = require("koa-router");
 const bodyParser = require('koa-bodyparser');
 const colors = require("colors");
-const redis = require("redis");
 
 const mysqlPool = require("./utils/mysqlPool");
+const redisClient = require("./utils/redisClient");
 const usersBLL = require("./bll/users");
 const loginBLL = require("./bll/login");
 const captchaBLL = require("./bll/captcha");
@@ -17,12 +17,9 @@ const serverPort = 10241;
 
 async function main () {
     try {
-
-        let client = redis.createClient({
-            host: "www.91weixin.net",
-            port: 6379,
-        });
-        console.log(client);
+        // let result = await redisClient.me().setexAsync("jimao", 20, "gushihao");
+        let result = await redisClient.me().getAsync("jimao");
+        console.log(result);
 
         
 
