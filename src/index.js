@@ -3,9 +3,11 @@
 const Koa = require("koa");
 const KoaRouter = require("koa-router");
 const colors = require("colors");
+const bodyParser = require('koa-bodyparser');
+
 const mysqlPool = require("./utils/mysqlPool");
 const usersBLL = require("./bll/users");
-const bodyParser = require('koa-bodyparser');
+const loginBLL = require("./bll/login");
 
 // 服务端端口
 const serverPort = 10241;
@@ -16,8 +18,7 @@ function hold404 (ctx, next) {
     ctx.status = code;
     ctx.body = {
         code: code,
-        data: null,
-        msg: "资源不存在",
+        message: "资源不存在",
     };
 }
 // 200中间件
@@ -31,9 +32,10 @@ function successResponse (ctx, data, message = "查询成功") {
     ctx.body = result;
 }
 // 500中间件
-function failureResponse (ctx, message = "服务器内部错误") {
+function failureResponse (ctx, message = "服务器内部错误", data) {
     let result = {
         code: 500,
+        data: data,
         message: message,
     };
     ctx.status = result.code;
@@ -55,12 +57,13 @@ async function main () {
             }
         });
 
+        // 注册用户
         router.post("/users/register", async (ctx, next) => {
             try {
                 let user = ctx.request.body;
                 let result = await usersBLL.registeredUser(user);
-                if (result.status == 0) {
-                    successResponse(ctx, result.data);
+                if (result.status) {
+                    successResponse(ctx, result.data, result.message);
                 }
                 else {
                     failureResponse(ctx, result.message);
@@ -68,7 +71,23 @@ async function main () {
             }
             catch (e) {
                 failureResponse(ctx, e.message);
-            } 
+            }
+        });
+
+        router.post("/login", async (ctx, next) => {
+            try {
+                let params = ctx.request.body;
+                let result = await loginBLL.loginValidation(params.account, params.password);
+                if (result.status) {
+                    successResponse(ctx, result.data, result.message);
+                }
+                else {
+                    failureResponse(ctx, result.message);
+                }
+            }
+            catch (e) {
+                failureResponse(ctx, e.message);
+            }
         });
 
         app

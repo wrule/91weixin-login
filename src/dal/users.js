@@ -5,7 +5,13 @@ const mysqlPool = require("../utils/mysqlPool");
 module.exports = {
     // 插入新用户
     async insertUser (user) {
-        return await mysqlPool.query("insert into users set ?", user);
+        let result = await mysqlPool.query("insert into users set ?", user);
+        if (result[0]) {
+            return result[0];
+        }
+        else {
+            return null;
+        }
     },
     // 根据昵称查询用户
     async queryUserByNickName (nickname) {
