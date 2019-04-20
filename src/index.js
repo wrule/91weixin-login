@@ -6,13 +6,10 @@ const bodyParser = require('koa-bodyparser');
 const colors = require("colors");
 
 const mysqlPool = require("./utils/mysqlPool");
-const redisClient = require("./utils/redisClient");
-
+const rsp = require("./utils/rsp");
 const usersBLL = require("./bll/users");
 const loginBLL = require("./bll/login");
 const captchaBLL = require("./bll/captcha");
-
-const rsp = require("./utils/rsp");
 
 // 服务端端口
 const serverPort = 10241;
