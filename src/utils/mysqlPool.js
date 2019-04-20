@@ -32,8 +32,8 @@ module.exports = {
         }
         return result;
     },
-    // 执行SQL语句
-    async exec (sql, params) {
+    // 执行SQL
+    async execute (sql, params) {
         let result = null;
         if (connection) {
             result = await connection.execute(sql, params);
