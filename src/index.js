@@ -58,7 +58,7 @@ async function main () {
         router.post("/api/captcha/update", async (ctx, next) => {
             try {
                 let params = ctx.request.body;
-                let result = await captchaBLL.newCAPTCHAService(params.uid);
+                let result = await captchaBLL.updateCAPTCHA(params.uid);
                 rsp.success(ctx, result);
             }
             catch (e) {

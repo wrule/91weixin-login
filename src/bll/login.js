@@ -3,6 +3,7 @@ const usersDAL = require("../dal/users");
 const JWT = require("jsonwebtoken");
 const appConfig = require("../../app.json");
 const redisClient = require("../utils/redisClient");
+const mysqlPool = require("../utils/mysqlPool");
 
 let client = redisClient.create(0);
 
@@ -21,21 +22,21 @@ module.exports = {
         else {
             return rtv.error("登录密码为空");
         }
-        // 多途径验证登录
-        let userResult = await usersDAL.queryUserByNickName(account);
-        if (!userResult) {
-            userResult = await usersDAL.queryUserByPhone(account);
+        // 多途径验证登录事务
+        let userResult = null;
+        await mysqlPool.tran(async cnt => {
+            userResult = await usersDAL.queryUserByNickName(account);
             if (!userResult) {
-                userResult = await usersDAL.queryUserByEmail(account);
+                userResult = await usersDAL.queryUserByPhone(account);
                 if (!userResult) {
-                    userResult = await usersDAL.queryUserByAccount(account);
+                    userResult = await usersDAL.queryUserByEmail(account);
                     if (!userResult) {
-                        return rtv.error("用户名或密码错误");
+                        userResult = await usersDAL.queryUserByAccount(account);
                     }
                 }
             }
-        }
-        if (userResult.password != password) {
+        });
+        if (!userResult || userResult.password != password) {
             return rtv.error("用户名或密码错误");
         }
         let tokenInfo = {
@@ -43,7 +44,7 @@ module.exports = {
             role: userResult.role,
         };
         let token = JWT.sign(tokenInfo, appConfig.privateKey);
-        await client.setex(token, 20 * 60, 1);
+        await client.setex(token, appConfig.tokenTimelen, 1);
         return rtv.success({ token: token }, "登录成功");
     }
 };

@@ -3,6 +3,7 @@ const UUID = require("uuid/v4");
 const rtv = require("../utils/rtv");
 const usersDAL = require("../dal/users");
 const captchaBLL = require("./captcha");
+const mysqlPool = require("../utils/mysqlPool");
 
 module.exports = {
     // 注册用户
@@ -30,26 +31,32 @@ module.exports = {
         delete user.captcha;
         user.nickname = user.nickname.trim();
         user.password = user.password.trim();
-        let findResult = await usersDAL.queryUserByNickName(user.nickname);
-        if (findResult) {
-            return rtv.error("该昵称已被占用");
-        }
-        if (user.phone) {
-            user.phone = user.phone.trim();
-            findResult = await usersDAL.queryUserByPhone(user.phone);
+        let rtValue = null;
+        await mysqlPool.tran(async cnt => {
+            let findResult = await usersDAL.queryUserByNickName(user.nickname);
             if (findResult) {
-                return rtv.error("该手机号码已被注册");
+                rtValue = rtv.error("该昵称已被占用");
+                return;
             }
-        }
-        user.id = UUID();
-        let result = await usersDAL.insertUser(user);
-        if (result) {
-            return rtv.success({
-                account: result.insertId.toString(),
-            }, "注册成功");
-        }
-        else {
-            return rtv.error("注册用户出错");
-        }
+            if (user.phone) {
+                user.phone = user.phone.trim();
+                findResult = await usersDAL.queryUserByPhone(user.phone);
+                if (findResult) {
+                    rtValue = rtv.error("该手机号码已被注册");
+                    return;
+                }
+            }
+            user.id = UUID();
+            let result = await usersDAL.insertUser(user);
+            if (result) {
+                rtValue = rtv.success({
+                    account: result.insertId.toString(),
+                }, "注册成功");
+            }
+            else {
+                rtValue = rtv.error("注册用户出错");
+            }
+        });
+        return rtValue;
     },
 };

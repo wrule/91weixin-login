@@ -2,6 +2,7 @@
 const UUID = require("uuid/v4");
 const svgCaptcha = require('svg-captcha');
 const redisClient = require("../utils/redisClient");
+const appConfig = require("../../app.json");
 
 let client = redisClient.create(1);
 
@@ -11,7 +12,7 @@ module.exports = {
         return svgCaptcha.create({
             color: true,
             noise: 3,
-            background: "#fafafa",
+            background: "white",
         });
     },
     // 生成一个图形验证码
@@ -24,7 +25,7 @@ module.exports = {
         // svg图片数据
         let svgImage = captcha.data;
         // 缓存到Redis
-        await client.setexAsync(uid, 180, code);
+        await client.setexAsync(uid, appConfig.CAPTCHATimelen, code);
         return {
             uid: uid,
             svgImage: svgImage,
@@ -40,7 +41,7 @@ module.exports = {
             // svg图片数据
             let svgImage = captcha.data;
             // 缓存到Redis
-            await client.setexAsync(uid, 180, code);
+            await client.setexAsync(uid, appConfig.CAPTCHATimelen, code);
             return {
                 uid: uid,
                 svgImage: svgImage,
