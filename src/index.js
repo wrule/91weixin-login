@@ -20,7 +20,7 @@ async function main () {
         let router = new KoaRouter();
         await mysqlPool.open();
         // 注册用户
-        router.post("/api/users/register", async (ctx, next) => {
+        router.post("/api/91wx/users/register", async (ctx, next) => {
             try {
                 let user = ctx.request.body;
                 let result = await usersBLL.registeredUser(user);
@@ -31,7 +31,7 @@ async function main () {
             }
         });
         // 登录验证
-        router.post("/api/login", async (ctx, next) => {
+        router.post("/api/91wx/login", async (ctx, next) => {
             try {
                 let params = ctx.request.body;
                 let result = await loginBLL.loginValidation(params.account, params.password);
@@ -42,7 +42,7 @@ async function main () {
             }
         });
         // 开启一个新的图形验证码服务
-        router.post("/api/captcha/new", async (ctx, next) => {
+        router.post("/api/91wx/captcha/new", async (ctx, next) => {
             try {
                 let result = await captchaBLL.newCAPTCHAService();
                 rsp.success(ctx, result);
@@ -52,7 +52,7 @@ async function main () {
             }
         });
         // 更新图形验证码
-        router.post("/api/captcha/update", async (ctx, next) => {
+        router.post("/api/91wx/captcha/update", async (ctx, next) => {
             try {
                 let params = ctx.request.body;
                 let result = await captchaBLL.updateCAPTCHA(params.uid);
