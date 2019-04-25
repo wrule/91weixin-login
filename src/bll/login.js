@@ -40,7 +40,7 @@ module.exports = {
             return rtv.error("用户名或密码错误");
         }
         let tokenInfo = {
-            account: userResult.account,
+            id: userResult.id,
             role: userResult.role,
         };
         let token = JWT.sign(tokenInfo, appConfig.privateKey);
